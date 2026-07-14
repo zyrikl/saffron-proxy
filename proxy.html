@@ -1,0 +1,91 @@
+<head></head>
+<body></body>
+<script src="helper.js"></script>
+<script src="proxy.js"></script>
+<script>
+    const query = window.location.search;
+    const params = new URLSearchParams(query);
+
+    const url = params.get('url');
+
+    async function main() {
+        const response = await get_cors_url(url);
+
+        if (response[1].startsWith('text/html')) {
+            let source = response[2];
+
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(source, 'text/html');
+
+            const links = doc.querySelectorAll('a');
+            links.forEach(link => {
+                const ou = link.getAttribute('href');
+                
+                link.setAttribute('href', `./proxy.html?url=${rtoa(ou, response[0])}`);
+            });
+
+            const styles = [...doc.querySelectorAll('link[rel="stylesheet"]')];
+            await Promise.all(styles.map(async (style) => {
+                console.log(style);
+                let ou = style.getAttribute('href');
+                if (ou) {
+                    ou = rtoa(ou, response[0]);
+                    let get_css = await get_cors_url(ou);
+
+                    const blob = new Blob([get_css[2]], { type: get_css[1] });
+                    const new_url = URL.createObjectURL(blob);
+
+                    style.setAttribute('href', new_url);
+                }
+            }));
+
+            const scripts = [...doc.querySelectorAll('script')];
+            await Promise.all(scripts.map(async (script) => {
+                console.log(script);
+                let ou = script.getAttribute('src');
+                if (ou) {
+                    ou = rtoa(ou, response[0]);
+                    let get_js = await get_cors_url(ou);
+
+                    const blob = new Blob([get_js[2]], { type: get_js[1] });
+                    const new_url = URL.createObjectURL(blob);
+
+                    script.setAttribute('src', new_url);
+                }
+            }));
+
+            const imgs = [...doc.querySelectorAll('img')];
+            await Promise.all(imgs.map(async (img) => {
+                console.log(img);
+                let ou = img.getAttribute('src');
+                if (ou) {
+                    ou = rtoa(ou, response[0]);
+
+                    let get_image = await get_cors_url(ou);
+                    let image_source = get_image[2];
+
+                    if (ou.endsWith('.png')) {
+                        const bytes = new Uint8Array(image_source.length);
+                        for (let i = 0; i < image_source.length; i++) {
+                            bytes[i] = image_source.charCodeAt(i);
+                        }
+
+                        const blob = new Blob([bytes], { type: get_image[1] });
+                        const image_url = URL.createObjectURL(blob);
+
+                        img.setAttribute('src', image_url);
+                    }
+                }
+            }));
+
+            //if (style_truth && img_truth) {
+                source = doc.body.innerHTML;
+                source2 = doc.head.innerHTML;
+                document.body.innerHTML = source;
+                document.head.innerHTML = source2;
+            //}
+        }
+    }
+
+    main();
+</script>

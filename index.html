@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Saffron proxy</title>
+    </head>
+    <body>
+        <url src="https://en.wikipedia.org"></url>
+        <script src="helper.js"></script>
+        <script src="proxy.js"></script>
+        <script>
+            function main() {
+                // clear cache?
+                //localStorage.clear();
+
+                let stylesheet = document.createElement('style');
+                stylesheet.textContent = 'html,body{margin:0px;padding:0px;}iframe{position:fixed;width:100%;height:100%;border:none;}';
+                document.body.appendChild(stylesheet);
+
+                const url_elements = document.querySelectorAll('url');
+
+                url_elements.forEach(async (url_element) => {
+                    let src_url = url_element.getAttribute('src');
+                    let src_iframe = document.createElement('iframe');
+                    src_iframe.src = `./proxy.html?url=${src_url}&access=${Date.now()}`;
+                    document.body.appendChild(src_iframe);
+                });
+            }
+
+            main();
+        </script>
+    </body>
+</html>
