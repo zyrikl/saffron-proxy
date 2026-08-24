@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="author" content="Charles Wang" />
+        <meta name="description" content="The Omicron fully-tabbed proxy, in a single file" />
+        <link rel="stylesheet" href="style.css" />
+        <!-- Created by Charles Wang, do not remove this attribution -->
+        <title>Omicron</title>
+    </head>
+    <body>
+        <canvas id="particles"></canvas>
+        <div id="tab-bar" style="overflow-x: scroll; height: 50px;">
+            <div id="new-tab">+</div>
+        </div>
+        <div id="controls">
+            <button id="back"><b>&lt;</b></button>
+            <button id="forward"><b>&gt;</b></button>
+            <button id="reload"><b>&#8635;</b></button>
+            <input type="text" id="address-bar" placeholder="Browse for anything..." autocomplete="off" autofocus />
+        </div>
+        <div id="browser">
+            <div id="default">
+                <h1>Omicron</h1>
+                <input id="search-bar" placeholder="Browse for anything..." autocomplete="off" />
+            </div>
+        </div>
+        <script src="background.js"></script>
+        <script src="omicron.js"></script>
+    </body>
+</html>
